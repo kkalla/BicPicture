@@ -2,3 +2,5 @@
 02_shopping_tran.txt
 03_non_shopping_tran.txt
 04_shopping_category.txt
+*.csv
+*.ipynb_checkpoints
