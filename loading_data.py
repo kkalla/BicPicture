@@ -42,8 +42,14 @@ class Data_loader():
                                              'RCT_NO':str,'DE_DT':str})
             origin_data['DE_DT'] = pd.to_datetime(origin_data['DE_DT'],format='%Y%m%d')
             origin_data = origin_data.sort_values(by=['ID','DE_DT','DE_HR'])
+            # delete Ids of people who purchased items less than 15 times
+            usedcount = origin_data.groupby(by='ID').count()
+            used = usedcount[usedcount.RCT_NO<=15].index
+            unused = origin_data[origin_data.ID.isin(used.values)].copy()
+            origin_data = origin_data[~origin_data.ID.isin(used.values)]
             # save sorted data
             origin_data.to_csv(os.path.join(self.data_dir,'shopping_sorted.csv'),index=False)
+            unused.to_csv(os.path.join(self.data_dir,'rnn_unused.csv'),index=False)
         # loading sorted data
         input_data = pd.read_csv(input_file,usecols=['ID','PD_S_C'],
                                  dtype={'ID':str,'PD_S_C':str})
