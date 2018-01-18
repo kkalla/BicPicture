@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--save_dir',type=str,default='save')
 parser.add_argument('-n','--num_samples',type=int,default=10)
-parser.add_argument('--prime',type=str,default=['0001','0002'])
+parser.add_argument('--prime',type=str,default=['0906','0807','0697','0265','0247'])
 parser.add_argument('--sample',type=int,default=1)
 
 def sample(args):
