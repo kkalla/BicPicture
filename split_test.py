@@ -8,7 +8,10 @@ Created on Tue Jan 16 01:02:49 2018
 """
 from __future__ import print_function
 
+import time
+
 import pandas as pd
+
 
 shop_data = pd.read_csv('data/shopping_sorted.csv',dtype={'ID':str,'PD_S_C':str,
                                              'RCT_NO':str,'DE_DT':str})
@@ -38,12 +41,19 @@ grouped = shop_data.groupby(by='ID')
 groups = grouped.groups
 keys = shop_data.ID.unique()
 train = pd.DataFrame()
+i = 0
+start = time.time()
 for key in keys:
     aa = groups.get(key)[:-5]
     aa = shop_data.iloc[aa,:]
     train = train.append(aa)
-    print(key)
+    if i%1000==0:
+        end = time.time()
+        print('step %d'%(i))
+        print('in time %f'%(end-start))
+        print(key)
+    i += 1
 
 print('train_seq done!!')
-train.info()
+print(train.info())
 train.to_csv('data/train_seq.csv',index=False)
