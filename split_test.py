@@ -19,7 +19,6 @@ test = pd.DataFrame()
 
 #test.to_csv('data/test_seq.csv',index=False)
 #print('test_seq done!!')
-=======
 # Store last 5 items to testset
 #test = pd.DataFrame()
 #for i in shop_data.ID.unique():
@@ -43,6 +42,7 @@ for key in keys:
     aa = groups.get(key)[:-5]
     aa = shop_data.iloc[aa,:]
     train = train.append(aa)
+    print(key)
 
 print('train_seq done!!')
 train.info()
