@@ -34,7 +34,7 @@ class RNN_Model():
         self.targets = tf.placeholder(tf.int32,[args.batch_size,args.seq_length])
         self.initial_state = cell.zero_state(args.batch_size,dtype = tf.float32)
         
-        with tf.name_scope('rnn_encoder'):
+        with tf.name_scope('rnn_cells'):
             # final w
             softmax_w = tf.get_variable('softmax_w',[args.rnn_size,args.vocab_size])
             # final bias
@@ -54,7 +54,7 @@ class RNN_Model():
         ## Using legacy_seq2seq#####################################
         outputs, last_state = legacy_seq2seq.rnn_decoder(
                 inputs,self.initial_state,cell,loop_function=loop if mode != 'INFER' else None,
-                scope = 'rnn_encoder')
+                scope = 'rnn_cells')
         output = tf.reshape(tf.concat(outputs,1),[-1,args.rnn_size])
         self.logits = tf.matmul(output,softmax_w) + softmax_b
         self.probs = tf.nn.softmax(self.logits)
