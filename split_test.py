@@ -10,9 +10,16 @@ from __future__ import print_function
 
 import pandas as pd
 
-shop_data = pd.read_csv('data/shopping_sorted.csv',dtype={'ID':str,'PD_S_C':str,
+shop_data = pd.read_csv('data/02_shopping_tran.txt',dtype={'ID':str,'PD_S_C':str,
                                              'RCT_NO':str,'DE_DT':str})
+non_shop_data = pd.read_csv('data/03_non_shopping_tran.txt')
 shop_data['DE_DT'] = pd.to_datetime(shop_data.DE_DT,format='%Y-%m-%d')
+#non_shop_data['CRYM'] = pd.to_datetime(non_shop_data.CRYM,format='%Y%m')
+#sort by date and hr
+shop_data = shop_data.sort_values(by=['ID','DE_DT','DE_HR'])
+#non_shop_data = non_shop_data.sort_values(by=['ID','CRYM'])
+shop_data.head()
+
 test = pd.DataFrame()
 #for i in shop_data.ID.unique():
 #    test.append(shop_data[shop_data.ID == i][-5:])
