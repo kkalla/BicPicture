@@ -22,17 +22,30 @@ shop_data['DE_DT'] = pd.to_datetime(shop_data.DE_DT,format='%Y-%m-%d')
 shop_data = shop_data.sort_values(by=['ID','DE_DT','DE_HR'])
 #non_shop_data = non_shop_data.sort_values(by=['ID','CRYM'])
 
-# split train and test
+# delete users who purchased items less than 10times
 grouped = shop_data.groupby(by='ID')
+count = grouped.count()
+unused_index = count[count.RCT_NO < 10].index
+unused = shop_data[shop_data.ID.isin(unused_index.values)].copy()
+used = shop_data[~shop_data.ID.isin(unused_index.values)]
+
+print('Saving unused users')
+unused.to_csv('data/rnn_unused_users.csv',index=False)
+
+#reindexing
+used = used.reindex
+
+# split train and test
+grouped = used.groupby(by='ID')
 groups = grouped.groups
-keys = shop_data.ID.unique()
+keys = used.ID.unique()
 
 test = pd.DataFrame()
 i = 0
 start = time.time()
 for key in keys:
     aa = groups.get(key)[-5:]
-    aa = shop_data.iloc[aa,:]
+    aa = used.iloc[aa,:]
     test = test.append(aa)
     if i%1000==0:
         end = time.time()
@@ -49,7 +62,7 @@ i = 0
 start = time.time()
 for key in keys:
     aa = groups.get(key)[:-5]
-    aa = shop_data.iloc[aa,:]
+    aa = used.iloc[aa,:]
     train = train.append(aa)
     if i%1000==0:
         end = time.time()
@@ -57,7 +70,6 @@ for key in keys:
         print('in time %f'%(end-start))
         print(key)
     i += 1
-
 print('train_seq done!!')
 print(train.info())
 train.to_csv('data/train_seq.csv',index=False)
