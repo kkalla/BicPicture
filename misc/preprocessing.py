@@ -16,11 +16,12 @@ train.head()
 
 #subsetting
 train_sub = train[['ID','PD_S_C','DE_DT','DE_HR']].copy()
+train_sub['DE_DT'] = pd.to_datetime(train_sub.DE_DT)
 train_sub = train_sub.drop_duplicates()
 train_sub.reset_index(inplace=True)
+train_sub = train_sub.iloc[:,1:]
 
-#Split train and target
-# train .7 test .3
+#Split source and target by quarter
 grouped = train_sub.groupby('ID')
 ids = train_sub.ID.unique()
 src_dataset = pd.DataFrame()
@@ -31,12 +32,12 @@ for id in ids:
         print('# of steps: %d, id: %s'%(i+1,id))
     indexes = grouped.groups.get(id).values
     subset = train_sub.iloc[indexes,:]
-    length_subset = subset.shape[0]
-    src_size = int(length_subset*.7)
-    tgt_size = length_subset - src_size
-    src_dataset = src_dataset.append(subset.iloc[:src_size,:])
-    tgt_dataset = tgt_dataset.append(subset.iloc[-tgt_size:,:])
+    q1_src = subset[subset.DE_DT < pd.to_datetime('2015-03-01')]
+    
     i += 1
+    
+def split_src_tgt(subset,quarters):
+    q1_src
 #Save to csv
 print('saving train_processed')
 train_sub.to_csv('../data/train_processed.csv',index=False)
