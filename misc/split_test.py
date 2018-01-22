@@ -12,7 +12,7 @@ import time
 
 import pandas as pd
 
-shop_data = pd.read_csv('data/02_shopping_tran.txt',dtype={'ID':str,'PD_S_C':str,'RCT_NO':str,'DE_DT':str})
+shop_data = pd.read_csv('../data/02_shopping_tran.txt',dtype={'ID':str,'PD_S_C':str,'RCT_NO':str,'DE_DT':str})
 shop_data['DE_DT'] = pd.to_datetime(shop_data.DE_DT,format='%Y-%m-%d')
 
 #non_shop_data = pd.read_csv('data/03_non_shopping_tran.txt')
@@ -30,7 +30,7 @@ unused = shop_data[shop_data.ID.isin(unused_index.values)].copy()
 used = shop_data[~shop_data.ID.isin(unused_index.values)]
 
 print('Saving unused users')
-unused.to_csv('data/rnn_unused_users.csv',index=False)
+unused.to_csv('../data/rnn_unused_users.csv',index=False)
 
 #reindexing
 used = used.reindex
@@ -54,7 +54,7 @@ for key in keys:
         print(key)
     i += 1
 print('test_seq done!!')
-test.to_csv('data/test_seq.csv',index=False)
+test.to_csv('../data/test_seq.csv',index=False)
 
 
 train = pd.DataFrame()
@@ -72,4 +72,4 @@ for key in keys:
     i += 1
 print('train_seq done!!')
 print(train.info())
-train.to_csv('data/train_seq.csv',index=False)
+train.to_csv('../data/train_seq.csv',index=False)
