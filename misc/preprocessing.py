@@ -8,6 +8,7 @@ Created on Mon Jan 22 13:23:58 2018
 """
 
 import pandas as pd
+import numpy as np
 
 train = pd.read_csv('../data/train_seq.csv',dtype={'ID':str,'PD_S_C':str})
 #sorting
@@ -22,22 +23,39 @@ train_sub.reset_index(inplace=True)
 train_sub = train_sub.iloc[:,1:]
 
 #Split source and target by quarter
-grouped = train_sub.groupby('ID')
-ids = train_sub.ID.unique()
+def get_quarters(subset,quarters=['2015-03-01','2015-06-01','2015-09-01']):
+    quarters = pd.to_datetime(quarters)
+    q1 = subset[subset.DE_DT < quarters[0]]
+    q2 = subset[((subset.DE_DT < quarters[1]) & (subset.DE_DT>=quarters[0]))]
+    q3 = subset[((subset.DE_DT <quarters[2]) & (subset.DE_DT >= quarters[1]))]
+    q4 = subset[(subset.DE_DT >= quarters[2])]
+    return q1,q2,q3,q4
+
+def split_src_tgt(subset):
+    max_month = subset.DE_DT.max().month
+    max_date = pd.to_datetime('2015-'+str(max_month)+'-01')
+    src = subset[subset.DE_DT < max_date]
+    tgt = subset[subset.DE_DT >= max_date]
+    return src,tgt
+
 src_dataset = pd.DataFrame()
 tgt_dataset = pd.DataFrame()
-i = 0
-for id in ids:
-    if i % 1000==0:
-        print('# of steps: %d, id: %s'%(i+1,id))
-    indexes = grouped.groups.get(id).values
-    subset = train_sub.iloc[indexes,:]
-    q1_src = subset[subset.DE_DT < pd.to_datetime('2015-03-01')]
-    
+
+q1,q2,q3,q4 = get_quarters(train_sub)
+i = 1
+for q in [q1,q2,q3,q4]:
+    src,tgt = split_src_tgt(q)
+    src_group = np.repeat(i,len(src))
+    tgt_group = np.repeat(i,len(tgt))
+    src.loc[:,'GROUP'] = src_group
+    tgt.loc[:,'GROUP'] = tgt_group
+    src_dataset = src_dataset.append(src)
+    tgt_dataset = tgt_dataset.append(tgt)
     i += 1
-    
-def split_src_tgt(subset,quarters):
-    q1_src
+
+# sort src, tgt_dataset
+src_dataset.sort_values(by=['ID','DE_DT','DE_HR'],inplace=True)
+tgt_dataset.sort_values(by=['ID','DE_DT','DE_HR'],inplace=True)
 #Save to csv
 print('saving train_processed')
 train_sub.to_csv('../data/train_processed.csv',index=False)
